@@ -26,3 +26,7 @@ No Node.js, npm, local server, or downloaded app required.
 
 ## Race upgrades
 Original scrolling road camera restored. Cars bounce from boundaries and one another. Gas is required to move (cars coast to a stop on release). Boost flames appear when GAS + BOOST are held. Start uses red signal lights and a four-second countdown. Pause/Resume is in the host header and freezes race simulation and countdown.
+
+
+## Stadium visuals update
+The original scrolling road remains, but the camera zoom now makes the racing surface take up most of the game canvas. The roadside grass and trees have been replaced by concrete grandstands, bleacher rows, safety fencing, and colorful crowds. The existing room PIN, phone controllers, collisions, boost flames, pause, and starting lights are unchanged.

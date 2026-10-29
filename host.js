@@ -61,8 +61,35 @@ setInterval(()=>{
 resetTrack();if(typeof Peer==='undefined'){$('networkHelp').textContent='PeerJS could not load. Check internet connection.';}else hostRoom();
 function center(y){if(!race)return 0;const a=race.nodes;let k=Math.max(0,Math.min(a.length-2,Math.floor(y/6200*(a.length-1))));const t=(y-a[k].y)/(a[k+1].y-a[k].y);return a[k].x+(a[k+1].x-a[k].x)*Math.max(0,Math.min(1,t));}
 // Original scrolling road view restored.
-function draw(){const rect=canvas.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);if(canvas.width!==Math.floor(rect.width*dpr)||canvas.height!==Math.floor(rect.height*dpr)){canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;}ctx.setTransform(dpr,0,0,dpr,0,0);const w=rect.width,h=rect.height;ctx.fillStyle='#4e8b75';ctx.fillRect(0,0,w,h);const racers=Object.values(players);const lead=Math.max(0,...racers.map(p=>p.progress));const camera=Math.max(0,lead-160);const scale=Math.min(1.25,w/680);const px=y=>h*.78-(y-camera)*scale;const cx=y=>w/2+(center(y)-center(camera))*scale;const from=camera-250,to=camera+h/scale+300;
-if(race){for(let width of [140,128,112]){ctx.beginPath();for(let y=from;y<=to;y+=12){const x=cx(y),sy=px(y);if(y===from)ctx.moveTo(x-width*scale,sy);else ctx.lineTo(x-width*scale,sy);}for(let y=to;y>=from;y-=12)ctx.lineTo(cx(y)+width*scale,px(y));ctx.closePath();ctx.fillStyle=width===140?'#cbd9bc':width===128?'#df6866':'#343c53';ctx.fill();}ctx.strokeStyle='#e9e9da77';ctx.lineWidth=3;ctx.setLineDash([18,22]);for(const lane of [-55,55]){ctx.beginPath();for(let y=from;y<=to;y+=10){const x=cx(y)+lane*scale;if(y===from)ctx.moveTo(x,px(y));else ctx.lineTo(x,px(y));}ctx.stroke();}ctx.setLineDash([]);for(let y=300;y<6200;y+=380){const sy=px(y);if(sy<-30||sy>h+30)continue;for(const side of [-1,1]){const x=cx(y)+side*190*scale;ctx.fillStyle='#234d41';ctx.beginPath();ctx.arc(x+4,sy+5,18*scale,0,7);ctx.fill();ctx.fillStyle='#c1f078';ctx.beginPath();ctx.arc(x,sy,15*scale,0,7);ctx.fill();}}const finish=px(6200);if(finish>-40&&finish<h+40){for(let i=-6;i<6;i++){ctx.fillStyle=i%2?'white':'#111';ctx.fillRect(cx(6200)+i*20*scale,finish,20*scale,12*scale);}}}
+function draw(){const rect=canvas.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);if(canvas.width!==Math.floor(rect.width*dpr)||canvas.height!==Math.floor(rect.height*dpr)){canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;}ctx.setTransform(dpr,0,0,dpr,0,0);const w=rect.width,h=rect.height;ctx.fillStyle='#222b3e';ctx.fillRect(0,0,w,h);const racers=Object.values(players);const lead=Math.max(0,...racers.map(p=>p.progress));const camera=Math.max(0,lead-160);const scale=Math.min(2.6,w/365);const px=y=>h*.78-(y-camera)*scale;const cx=y=>w/2+(center(y)-center(camera))*scale;const from=camera-250,to=camera+h/scale+300;
+if(race){for(let width of [140,128,112]){ctx.beginPath();for(let y=from;y<=to;y+=12){const x=cx(y),sy=px(y);if(y===from)ctx.moveTo(x-width*scale,sy);else ctx.lineTo(x-width*scale,sy);}for(let y=to;y>=from;y-=12)ctx.lineTo(cx(y)+width*scale,px(y));ctx.closePath();ctx.fillStyle=width===140?'#cbd9bc':width===128?'#df6866':'#343c53';ctx.fill();}ctx.strokeStyle='#e9e9da77';ctx.lineWidth=3;ctx.setLineDash([18,22]);for(const lane of [-55,55]){ctx.beginPath();for(let y=from;y<=to;y+=10){const x=cx(y)+lane*scale;if(y===from)ctx.moveTo(x,px(y));else ctx.lineTo(x,px(y));}ctx.stroke();}ctx.setLineDash([]);// Grandstands and fans follow the track on both sides, replacing the grass.
+for(const side of [-1,1]){
+  // Stadium concrete concourse, colored bleacher tiers and safety fencing.
+  for(let band=0;band<4;band++){
+    const inner=side*(143+band*30)*scale,outer=side*(173+band*30)*scale;
+    ctx.beginPath();
+    for(let y=from;y<=to;y+=14){const x=cx(y)+inner;if(y===from)ctx.moveTo(x,px(y));else ctx.lineTo(x,px(y));}
+    for(let y=to;y>=from;y-=14)ctx.lineTo(cx(y)+outer,px(y));
+    ctx.closePath();ctx.fillStyle=['#687389','#36425d','#58647d','#303a53'][band];ctx.fill();
+  }
+  // Spectator dots, staggered in rows so the crowd looks packed.
+  for(let y=Math.floor(from/20)*20;y<=to;y+=20){
+    const sy=px(y);if(sy < -15 || sy > h+15)continue;
+    for(let row=0;row<4;row++){
+      const offset=161+row*29;
+      const x=cx(y)+side*offset*scale;
+      const seed=Math.abs(Math.floor(y/20)*37+row*71+(side+1)*13);
+      const fanColors=['#f9d46b','#fa8197','#80d6f4','#f6f0dd','#bbadff','#a4f2ba'];
+      ctx.fillStyle=fanColors[seed%fanColors.length];
+      ctx.beginPath();ctx.arc(x,sy,Math.max(1.6,2.6*scale),0,Math.PI*2);ctx.fill();
+    }
+  }
+  ctx.beginPath();for(let y=from;y<=to;y+=12){const x=cx(y)+side*142*scale;if(y===from)ctx.moveTo(x,px(y));else ctx.lineTo(x,px(y));}
+  ctx.strokeStyle='#f5f5f5';ctx.lineWidth=Math.max(2,3*scale);ctx.stroke();
+  ctx.beginPath();for(let y=from;y<=to;y+=12){const x=cx(y)+side*147*scale;if(y===from)ctx.moveTo(x,px(y));else ctx.lineTo(x,px(y));}
+  ctx.strokeStyle='#93a4c4';ctx.lineWidth=Math.max(1,1.5*scale);ctx.stroke();
+}
+const finish=px(6200);if(finish>-40&&finish<h+40){for(let i=-6;i<6;i++){ctx.fillStyle=i%2?'white':'#111';ctx.fillRect(cx(6200)+i*20*scale,finish,20*scale,12*scale);}}}
 for(const p of racers){const sy=px(p.progress);if(sy< -50||sy>h+50)continue;const x=cx(p.progress)+p.lane*scale;ctx.save();ctx.translate(x,sy);ctx.rotate(-(p.heading||0));if(p.input?.boost&&p.input?.gas&&phase==='racing'&&Date.now()>=started&&!p.finished){const flame=12+Math.random()*15;ctx.fillStyle='#ff6a15';ctx.beginPath();ctx.moveTo(-10*scale,17*scale);ctx.lineTo(0,(26+flame)*scale);ctx.lineTo(10*scale,17*scale);ctx.fill();ctx.fillStyle='#ffeb68';ctx.beginPath();ctx.moveTo(-5*scale,18*scale);ctx.lineTo(0,(22+flame*.55)*scale);ctx.lineTo(5*scale,18*scale);ctx.fill();}ctx.fillStyle='#1119';ctx.fillRect(-15*scale,-19*scale,30*scale,42*scale);ctx.fillStyle=p.impact>0?'#ffffff':p.color;ctx.beginPath();ctx.roundRect(-13*scale,-23*scale,26*scale,43*scale,6*scale);ctx.fill();ctx.fillStyle='#16253e';ctx.fillRect(-9*scale,-9*scale,18*scale,13*scale);ctx.fillStyle='#fff';ctx.font=`bold ${12*scale}px system-ui`;ctx.textAlign='center';ctx.fillText(p.name,0,-33*scale);ctx.restore();}
 ctx.fillStyle='#0b1329aa';ctx.fillRect(12,h-62,Math.min(330,w-24),48);ctx.fillStyle='#fff';ctx.font='bold 12px system-ui';ctx.fillText('FINISH LINE  •  '+Math.round(lead/62)+'% COMPLETE',25,h-33);
 if(phase==='racing'&&Date.now()<started){const left=started-Date.now();const lit=left>3000?0:left>2000?1:left>1000?2:3;const centerX=w/2,centerY=h*.27;ctx.fillStyle='#101827e8';ctx.beginPath();ctx.roundRect(centerX-108,centerY-43,216,100,22);ctx.fill();for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(centerX-65+i*65,centerY,21,0,Math.PI*2);ctx.fillStyle=i<lit?'#ff4c3f':'#465064';ctx.fill();}ctx.font='900 19px system-ui';ctx.textAlign='center';ctx.fillStyle='white';ctx.fillText(lit===3?'GO!':'GET READY',centerX,centerY+42);}
