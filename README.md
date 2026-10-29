@@ -38,3 +38,6 @@ Each NEW TRACK creates a smooth, randomized **closed-loop** circuit with bends, 
 - After pressing **START RACE**, the **LIVE TRACK MAP** replaces the joining instructions at the top of the **right sidebar**. It shows the complete circuit and moving, player-colored dots plus a name legend. The roster remains below it.
 - On the phone, **hold GAS and BOOST simultaneously** to accelerate faster (610 versus 320 track units/second). Orange/yellow flames appear behind the kart while turbo is engaged. BRAKE overrides boost. Releasing GAS slows the car.
 - If the published website still looks old, make sure you uploaded and committed **all six files** to the repository root, wait for GitHub Pages deployment, then hard-refresh the host and phone browsers.
+
+## Leader camera and tilt-only steering
+The main race camera centers on the leading kart (highest race progress), while the right-side minimap continues to show every racer. Steering comes only from phone orientation after tapping ENABLE TILT CONTROL and allowing motion permission. If tilt is unavailable, the car stays straight; gas, brake, and boost still work. GitHub Pages HTTPS is recommended for device orientation access.

@@ -89,14 +89,14 @@ setInterval(()=>{
  broadcast({type:'tick',players,phase,started});update();
 },50);
 resetTrack();if(typeof Peer==='undefined'){$('networkHelp').textContent='PeerJS could not load. Check internet connection.';}else hostRoom();
-// The large view follows the leading kart along the loop; the entire circuit is always visible on the minimap.
+// The camera locks onto the racer with the highest progress; the minimap shows the whole loop.
 function draw(){
  const rect=canvas.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);
  if(canvas.width!==Math.floor(rect.width*dpr)||canvas.height!==Math.floor(rect.height*dpr)){canvas.width=Math.floor(rect.width*dpr);canvas.height=Math.floor(rect.height*dpr);}
  ctx.setTransform(dpr,0,0,dpr,0,0);const w=rect.width,h=rect.height;
  ctx.fillStyle='#202b3d';ctx.fillRect(0,0,w,h);
  const racers=Object.values(players),lead=Math.max(0,...racers.map(p=>p.progress));
- const focus=pointAt(Math.max(0,lead-85)),scale=Math.max(1.05,Math.min(2.15,w/345));
+ const focus=pointAt(lead),scale=Math.max(1.05,Math.min(2.15,w/345));
  const project=(x,y)=>({x:w*.5+(x-focus.x)*scale,y:h*.55-(y-focus.y)*scale});
  if(race){
   const nodes=race.nodes;
