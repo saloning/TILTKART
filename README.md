@@ -30,3 +30,6 @@ Original scrolling road camera restored. Cars bounce from boundaries and one ano
 
 ## Stadium visuals update
 The original scrolling road remains, but the camera zoom now makes the racing surface take up most of the game canvas. The roadside grass and trees have been replaced by concrete grandstands, bleacher rows, safety fencing, and colorful crowds. The existing room PIN, phone controllers, collisions, boost flames, pause, and starting lights are unchanged.
+
+## Closed circuit and live minimap
+Each NEW TRACK creates a smooth, randomized **closed-loop** circuit with bends, a start/finish stripe, and three laps. The main camera follows the race around the course, retaining the large scrolling stadium road. Once the race starts, the right sidebar displays a complete map of the circuit with color-coded live player positions. Road boundaries, car collisions, boost flames, starting lights, gas control, and pause remain enabled.
