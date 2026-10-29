@@ -33,3 +33,8 @@ The original scrolling road remains, but the camera zoom now makes the racing su
 
 ## Closed circuit and live minimap
 Each NEW TRACK creates a smooth, randomized **closed-loop** circuit with bends, a start/finish stripe, and three laps. The main camera follows the race around the course, retaining the large scrolling stadium road. Once the race starts, the right sidebar displays a complete map of the circuit with color-coded live player positions. Road boundaries, car collisions, boost flames, starting lights, gas control, and pause remain enabled.
+
+## New: race map and turbo boost
+- After pressing **START RACE**, the **LIVE TRACK MAP** replaces the joining instructions at the top of the **right sidebar**. It shows the complete circuit and moving, player-colored dots plus a name legend. The roster remains below it.
+- On the phone, **hold GAS and BOOST simultaneously** to accelerate faster (610 versus 320 track units/second). Orange/yellow flames appear behind the kart while turbo is engaged. BRAKE overrides boost. Releasing GAS slows the car.
+- If the published website still looks old, make sure you uploaded and committed **all six files** to the repository root, wait for GitHub Pages deployment, then hard-refresh the host and phone browsers.

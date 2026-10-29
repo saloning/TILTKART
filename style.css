@@ -3,3 +3,13 @@
 .join-step{font-size:13px;font-weight:700;color:#dce4f7;margin:18px 0 8px}.join-address{padding:13px 8px;border-radius:12px;background:#303c59;color:#d6ff5c;font-weight:900;font-size:clamp(12px,1.2vw,17px);overflow-wrap:anywhere;user-select:all}.room-code{font-size:42px;font-weight:1000;letter-spacing:.18em;color:#d6ff5c;background:#111827;border-radius:14px;padding:10px}.network-help{font-size:11px;color:#a6b1cb;font-weight:400!important}.join small{line-height:1.5}.phone-panel input{margin-top:12px;margin-bottom:12px}
 
 .track-map-panel{padding:14px!important}.track-map-panel h2{margin:3px 0 10px}.track-map-panel canvas{width:100%;height:225px;display:block;border-radius:12px;background:#101827}.track-map-panel small{display:block;margin-top:8px;font-size:10px;letter-spacing:0}.track-map-panel[hidden]{display:none!important}
+
+/* Keep the live map visible in the right sidebar throughout the race. */
+#joinPanel[hidden],#trackMapPanel[hidden]{display:none!important}
+#trackMapPanel{order:-1;background:#17223a;border:2px solid #526b8c;box-shadow:0 12px 30px #0004}
+#trackMapPanel h2{color:#d6ff5c;font-size:16px}
+#trackMapPanel canvas{height:285px;background:#0c1425}
+.map-legend{display:flex;flex-wrap:wrap;gap:8px 12px;margin:10px 0;color:#f4f6ff;font-size:12px}
+.map-legend span{display:inline-flex;align-items:center;white-space:nowrap}
+.map-legend .dot{margin-right:5px}
+@media(max-width:850px){#trackMapPanel canvas{height:240px}}

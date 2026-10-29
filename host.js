@@ -35,14 +35,16 @@ function pointAt(distance){
 }
 function state(){return {type:'state',players,phase,race,started};}
 function broadcast(msg){for(const c of connections.values())if(c.open)try{c.send(msg)}catch(e){console.warn(e)}}
-function resetTrack(){race=track();phase='lobby';started=0;pausedAt=0;$('pause').hidden=true;$('pause').textContent='⏸ PAUSE';for(const p of Object.values(players))Object.assign(p,{progress:0,lane:0,speed:0,heading:0,impact:0,finished:false,finishTime:null,input:blankInput()});broadcast(state());update();}
-function hostRoom(){if(peer){peer.destroy();peer=null;}roomCode=makeCode();$('roomCode').textContent=roomCode;$('networkHelp').textContent='Connecting room…';peer=new Peer('tiltkart-'+roomCode.toLowerCase(),{debug:1});peer.on('open',()=>{$('networkHelp').textContent='Room ready! Keep this tab open. Share the address and code.';});peer.on('error',err=>{if(err.type==='unavailable-id'){hostRoom();return;}$('networkHelp').textContent='Connection error: '+err.type+' — refresh to retry.';});peer.on('connection',conn=>{conn.on('data',msg=>{if(!msg||typeof msg!=='object')return;if(msg.type==='join'){if(phase!=='lobby'||Object.keys(players).length>=8){conn.send({type:'joinError',message:'Race started or lobby full'});return;}if(players[conn.peer])return;const id=conn.peer;players[id]={id,name:safeName(msg.name),color:colors[Object.keys(players).length],progress:0,lane:0,speed:0,heading:0,impact:0,finished:false,finishTime:null,input:blankInput()};connections.set(id,conn);conn.send({type:'joined',name:players[id].name});broadcast(state());update();}else if(msg.type==='input'&&players[conn.peer]){const a=msg.input||{};players[conn.peer].input={steer:Math.max(-1,Math.min(1,Number(a.steer)||0)),gas:!!a.gas,brake:!!a.brake,boost:!!a.boost};}});conn.on('close',()=>{connections.delete(conn.peer);delete players[conn.peer];broadcast(state());update();});conn.on('error',()=>{});});}
+function resetTrack(){race=track();phase='lobby';started=0;pausedAt=0;$('pause').hidden=true;$('pause').textContent='⏸ PAUSE';for(const p of Object.values(players))Object.assign(p,{progress:0,lane:0,speed:0,heading:0,impact:0,boosting:false,finished:false,finishTime:null,input:blankInput()});broadcast(state());update();}
+function hostRoom(){if(peer){peer.destroy();peer=null;}roomCode=makeCode();$('roomCode').textContent=roomCode;$('networkHelp').textContent='Connecting room…';peer=new Peer('tiltkart-'+roomCode.toLowerCase(),{debug:1});peer.on('open',()=>{$('networkHelp').textContent='Room ready! Keep this tab open. Share the address and code.';});peer.on('error',err=>{if(err.type==='unavailable-id'){hostRoom();return;}$('networkHelp').textContent='Connection error: '+err.type+' — refresh to retry.';});peer.on('connection',conn=>{conn.on('data',msg=>{if(!msg||typeof msg!=='object')return;if(msg.type==='join'){if(phase!=='lobby'||Object.keys(players).length>=8){conn.send({type:'joinError',message:'Race started or lobby full'});return;}if(players[conn.peer])return;const id=conn.peer;players[id]={id,name:safeName(msg.name),color:colors[Object.keys(players).length],progress:0,lane:0,speed:0,heading:0,impact:0,boosting:false,finished:false,finishTime:null,input:blankInput()};connections.set(id,conn);conn.send({type:'joined',name:players[id].name});broadcast(state());update();}else if(msg.type==='input'&&players[conn.peer]){const a=msg.input||{};players[conn.peer].input={steer:Math.max(-1,Math.min(1,Number(a.steer)||0)),gas:!!a.gas,brake:!!a.brake,boost:!!a.boost};}});conn.on('close',()=>{connections.delete(conn.peer);delete players[conn.peer];broadcast(state());update();});conn.on('error',()=>{});});}
 $('joinAddress').textContent=new URL('./',location.href).href;
 $('start').onclick=()=>{if(phase==='lobby'&&Object.keys(players).length){phase='racing';started=Date.now()+4000;$('pause').hidden=false;broadcast(state());update();}};
 $('reset').onclick=resetTrack;
 $('pause').onclick=()=>{if(phase==='racing'){phase='paused';pausedAt=Date.now();$('pause').textContent='▶ RESUME';}else if(phase==='paused'){started+=Date.now()-pausedAt;phase='racing';$('pause').textContent='⏸ PAUSE';}broadcast(state());update();};
 function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function update(){if($('trackMapPanel'))$('trackMapPanel').hidden=phase==='lobby';const arr=Object.values(players).sort((a,b)=>b.progress-a.progress);$('count').textContent=`${arr.length}/8`;$('players').innerHTML=arr.map(p=>`<div class="player"><span><i class="dot" style="background:${p.color}"></i>${escapeHtml(p.name)}</span><b>${p.finished?'🏁':'L'+Math.min(3,Math.floor(p.progress/race.lapLength)+1)+' · '+Math.round(p.progress/race.length*100)+'%'}</b></div>`).join('')||'No racers yet';const remain=Math.ceil((started-Date.now())/1000);$('status').textContent=phase==='lobby'?'Share link + code • Start when ready':phase==='finished'?'🏆 FINISH! '+(arr[0]?.name||''):phase==='paused'?'⏸ RACE PAUSED':remain>0?'STARTING IN '+remain:'🏎️ RACE IN PROGRESS';}
+function update(){if($('trackMapPanel'))$('trackMapPanel').hidden=phase==='lobby';
+ $('joinPanel').hidden=phase!=='lobby';const arr=Object.values(players).sort((a,b)=>b.progress-a.progress);$('mapLegend').innerHTML=arr.map(p=>`<span><i class="dot" style="background:${p.color}"></i>${escapeHtml(p.name)}</span>`).join('');
+ $('count').textContent=`${arr.length}/8`;$('players').innerHTML=arr.map(p=>`<div class="player"><span><i class="dot" style="background:${p.color}"></i>${escapeHtml(p.name)}</span><b>${p.finished?'🏁':'L'+Math.min(3,Math.floor(p.progress/race.lapLength)+1)+' · '+Math.round(p.progress/race.length*100)+'%'}</b></div>`).join('')||'No racers yet';const remain=Math.ceil((started-Date.now())/1000);$('status').textContent=phase==='lobby'?'Share link + code • Start when ready':phase==='finished'?'🏆 FINISH! '+(arr[0]?.name||''):phase==='paused'?'⏸ RACE PAUSED':remain>0?'STARTING IN '+remain:'🏎️ RACE IN PROGRESS';}
 let last=performance.now();
 const ROAD_LIMIT=108, CAR_RADIUS=17;
 setInterval(()=>{
@@ -52,8 +54,10 @@ setInterval(()=>{
   for(const p of racers){
    if(p.finished)continue;
    const input=p.input;
-   const target=input.brake?0:input.gas?(input.boost?460:320):0;
-   p.speed+=(target-p.speed)*Math.min(1,dt*(input.brake?8:input.gas?3.2:6));if(p.speed<1)p.speed=0;
+   const boosting=!!(input.gas&&input.boost&&!input.brake);
+   const target=input.brake?0:input.gas?(boosting?610:320):0;
+   p.boosting=boosting;
+   p.speed+=(target-p.speed)*Math.min(1,dt*(input.brake?8:boosting?6.5:input.gas?3.2:6));if(p.speed<1)p.speed=0;
    p.impact=Math.max(0,(p.impact||0)-dt);
    const turn=Number(input.steer)||0;
    p.heading+=(turn*.32-p.heading)*Math.min(1,dt*9);
@@ -115,7 +119,7 @@ function draw(){
  }
  for(const p of racers){const loc=pointAt(p.progress),pos=project(loc.x+loc.nx*p.lane,loc.y+loc.ny*p.lane);if(pos.x<-70||pos.x>w+70||pos.y<-70||pos.y>h+70)continue;
   ctx.save();ctx.translate(pos.x,pos.y);ctx.rotate(Math.atan2(-loc.ty,loc.tx)+Math.PI/2-(p.heading||0));
-  if(p.input?.boost&&p.input?.gas&&phase==='racing'&&Date.now()>=started&&!p.finished){const flame=12+Math.random()*15;ctx.fillStyle='#ff6a15';ctx.beginPath();ctx.moveTo(-10*scale,17*scale);ctx.lineTo(0,(26+flame)*scale);ctx.lineTo(10*scale,17*scale);ctx.fill();ctx.fillStyle='#ffeb68';ctx.beginPath();ctx.moveTo(-5*scale,18*scale);ctx.lineTo(0,(22+flame*.55)*scale);ctx.lineTo(5*scale,18*scale);ctx.fill();}
+  if(p.boosting&&phase==='racing'&&Date.now()>=started&&!p.finished){const flame=20+Math.random()*20;ctx.fillStyle='#ff6a15';ctx.beginPath();ctx.moveTo(-10*scale,17*scale);ctx.lineTo(0,(26+flame)*scale);ctx.lineTo(10*scale,17*scale);ctx.fill();ctx.fillStyle='#ffeb68';ctx.beginPath();ctx.moveTo(-5*scale,18*scale);ctx.lineTo(0,(22+flame*.55)*scale);ctx.lineTo(5*scale,18*scale);ctx.fill();}
   ctx.fillStyle='#1119';ctx.fillRect(-15*scale,-19*scale,30*scale,42*scale);ctx.fillStyle=p.impact>0?'#ffffff':p.color;ctx.beginPath();ctx.roundRect(-13*scale,-23*scale,26*scale,43*scale,6*scale);ctx.fill();ctx.fillStyle='#16253e';ctx.fillRect(-9*scale,-9*scale,18*scale,13*scale);ctx.restore();
   ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText(p.name,pos.x,pos.y-34*scale);
  }
