@@ -23,3 +23,6 @@ No Node.js, npm, local server, or downloaded app required.
 - Phone: the same website automatically redirects to `controller.html` for the PIN/name join screen and then the controls.
 - To host from a mobile browser deliberately, add `?host=1` to the main website URL.
 - After uploading updated files, allow a minute for GitHub Pages to deploy, then refresh both browsers.
+
+## Race upgrades
+Original scrolling road camera restored. Cars bounce from boundaries and one another. Gas is required to move (cars coast to a stop on release). Boost flames appear when GAS + BOOST are held. Start uses red signal lights and a four-second countdown. Pause/Resume is in the host header and freezes race simulation and countdown.
